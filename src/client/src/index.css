@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  font-family:
+    -apple-system, Verdana, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family:
+    source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+.custom-select {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.5rem 1rem;
+  background-color: #fff;
+  transition:
+    border-color 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+}
+
+.custom-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.custom-select:hover {
+  border-color: #adb5bd;
+}
+
+.custom-select option {
+  padding: 0.5rem;
+}
+
+.form-control,
+.form-select,
+.btn,
+.list-group-item {
+  font-family: 'Arial', sans-serif;
+}
+
+.accordion-button {
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 700;
+}
