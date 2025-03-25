@@ -15,8 +15,9 @@ This is a **NestJS** application starter with MongoDB integration. If necessary,
 - Order cancellation
 - Caching
 - Pagination
-- Unit test
+- Unit tests
 - E2E tests
+- Admin interface
 
 ## Installation
 
