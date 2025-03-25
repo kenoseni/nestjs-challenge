@@ -68,7 +68,7 @@ describe('UserService', () => {
 
   describe('createUser', () => {
     it('should create and return a new user', async () => {
-      const userData = { username: 'newuser', roles: ['admin'] };
+      const userData = { username: 'newuser', roles: ['creator'] };
 
       const result = await service.createUser(userData);
 

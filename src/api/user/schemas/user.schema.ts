@@ -15,8 +15,9 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   username: string;
 
+  // e.g., ['creator'], ['customer'], or both
   @Prop({ type: [String], required: true })
-  roles: string[]; // e.g., ['creator'], ['customer'], or both
+  roles: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -73,10 +73,6 @@ import { JwtStrategy } from './api/user/strategy/jwt.strategy';
 
     MongooseModule.forRootAsync({
       useFactory: (config: ConfigService) => {
-        console.log(
-          '========================',
-          config.get<string>(AppConfig.mongoUrl),
-        );
         return {
           uri: config.get<string>(AppConfig.mongoUrl),
         };
@@ -98,7 +94,6 @@ import { JwtStrategy } from './api/user/strategy/jwt.strategy';
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
-    // Register first to catch Mongoose/MongoDB errors
     {
       provide: APP_FILTER,
       useClass: DbExceptionsFilter,
