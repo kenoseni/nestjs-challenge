@@ -1,145 +1,123 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecordController } from './record.controller';
-import { getModelToken } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Record } from '../schemas/record.schema';
+import { RecordService } from '../services/record.service';
 import { CreateRecordRequestDTO } from '../dtos/create-record.request.dto';
-import { RecordCategory, RecordFormat } from '../schemas/record.enum';
+import { UpdateRecordRequestDTO } from '../dtos/update-record.request.dto';
+import { FindAllQueryDto } from '../dtos/filter-record.dto';
+import { ResponseCode } from 'src/api/common/constant';
+import { RecordFormat, RecordCategory } from '../schemas/record.enum';
+import { Record as RecordModel } from '../schemas/record.schema';
 
 describe('RecordController', () => {
-  let recordController: RecordController;
-  let recordModel: Model<Record>;
+  let controller: RecordController;
+  let recordService: Partial<Record<keyof RecordService, jest.Mock>>;
+
+  const mockRecord = {
+    _id: 'record-id',
+    album: 'Test Album',
+    artist: 'Test Artist',
+    price: 10,
+    qty: 1,
+    format: RecordFormat.VINYL,
+    category: RecordCategory.ROCK,
+    mbid: '',
+  };
 
   beforeEach(async () => {
+    recordService = {
+      createRecord: jest.fn().mockResolvedValue(mockRecord),
+      updateRecord: jest
+        .fn()
+        .mockResolvedValue({ ...mockRecord, album: 'Updated Album' }),
+      findAllRecords: jest
+        .fn()
+        .mockResolvedValue({ items: [mockRecord], total: 1 }),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RecordController],
       providers: [
-        {
-          provide: getModelToken('Record'),
-          useValue: {
-            new: jest.fn().mockResolvedValue({}),
-            constructor: jest.fn().mockResolvedValue({}),
-            find: jest.fn(),
-            findById: jest.fn(),
-            save: jest.fn(),
-            create: jest.fn(),
-          },
-        },
+        { provide: RecordService, useValue: recordService },
+        { provide: RecordModel.name, useValue: {} },
       ],
     }).compile();
 
-    recordController = module.get<RecordController>(RecordController);
-    recordModel = module.get<Model<Record>>(getModelToken('Record'));
+    controller = module.get<RecordController>(RecordController);
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
-
-  // it('should create a new record', async () => {
-  //   const createRecordDto: CreateRecordRequestDTO = {
-  //     artist: 'Test',
-  //     album: 'Test Record',
-  //     price: 100,
-  //     qty: 10,
-  //     format: RecordFormat.VINYL,
-  //     category: RecordCategory.ALTERNATIVE,
-  //   };
-
-  //   const savedRecord = {
-  //     _id: '1',
-  //     name: 'Test Record',
-  //     price: 100,
-  //     qty: 10,
-  //   };
-
-  //   jest.spyOn(recordModel, 'create').mockResolvedValue(savedRecord as any);
-
-  //   const result = await recordController.create(createRecordDto);
-  //   expect(result).toEqual(savedRecord);
-  //   expect(recordModel.create).toHaveBeenCalledWith({
-  //     artist: 'Test',
-  //     album: 'Test Record',
-  //     price: 100,
-  //     qty: 10,
-  //     category: RecordCategory.ALTERNATIVE,
-  //     format: RecordFormat.VINYL,
-  //   });
-  // });
-
-  // it('should return an array of records', async () => {
-  //   const records = [
-  //     { _id: '1', name: 'Record 1', price: 100, qty: 10 },
-  //     { _id: '2', name: 'Record 2', price: 200, qty: 20 },
-  //   ];
-
-  //   jest.spyOn(recordModel, 'find').mockReturnValue({
-  //     exec: jest.fn().mockResolvedValue(records),
-  //   } as any);
-
-  //   const result = await recordController.findAll();
-  //   expect(result).toEqual(records);
-  //   expect(recordModel.find).toHaveBeenCalled();
-  // });
-
-  // Create Method Tests
   describe('create', () => {
-    it('should create a new record with valid input', async () => {
+    it('should create a record successfully', async () => {
       const createRecordDto: CreateRecordRequestDTO = {
-        artist: 'Test Artist',
         album: 'Test Album',
-        price: 100,
-        qty: 10,
+        artist: 'Test Artist',
+        price: 10,
+        qty: 1,
         format: RecordFormat.VINYL,
-        category: RecordCategory.ALTERNATIVE,
+        category: RecordCategory.ROCK,
+        mbid: '',
       };
 
-      const savedRecord = {
-        _id: '1',
-        artist: 'Test Artist',
-        album: 'Test Album',
-        price: 100,
-        qty: 10,
-        format: RecordFormat.VINYL,
-        category: RecordCategory.ALTERNATIVE,
-      };
+      const result = await controller.create(createRecordDto);
 
-      jest.spyOn(recordModel, 'create').mockResolvedValue(savedRecord as any);
-
-      const result = await recordController.create(createRecordDto);
-
-      expect(result).toEqual(savedRecord);
-      expect(recordModel.create).toHaveBeenCalledWith(createRecordDto);
+      expect(recordService.createRecord).toHaveBeenCalledWith(createRecordDto);
+      expect(recordService.createRecord).toHaveBeenCalledWith(createRecordDto);
+      expect(result).toEqual({
+        responseCode: ResponseCode.SUCCESSFUL,
+        responseText: 'Record successfully created.',
+        data: mockRecord,
+      });
     });
+  });
 
-    it('should throw an error if artist is missing', async () => {
-      const createRecordDto: Partial<CreateRecordRequestDTO> = {
-        artist: '',
-        album: 'Test Album',
-        price: 100,
-        qty: 10,
-        format: RecordFormat.VINYL,
-        category: RecordCategory.ALTERNATIVE,
-      };
-
-      await expect(
-        recordController.create(createRecordDto as CreateRecordRequestDTO),
-      ).rejects.toThrow('Validation failed: artist is required');
-    });
-
-    it('should throw an error if price is negative', async () => {
-      const createRecordDto: CreateRecordRequestDTO = {
+  describe('update', () => {
+    it('should update a record successfully', async () => {
+      const updateDto: UpdateRecordRequestDTO = {
+        album: 'Updated Album',
         artist: 'Test Artist',
-        album: 'Test Album',
-        price: -100,
-        qty: 10,
+        price: 15,
+        qty: 2,
         format: RecordFormat.VINYL,
-        category: RecordCategory.ALTERNATIVE,
+        category: RecordCategory.ROCK,
+        mbid: '',
       };
+      const recordId = 'record-id';
 
-      await expect(recordController.create(createRecordDto)).rejects.toThrow(
-        'Validation failed: price must be positive',
+      const result = await controller.update(recordId, updateDto);
+
+      expect(recordService.updateRecord).toHaveBeenCalledWith(
+        recordId,
+        updateDto,
       );
+      expect(result).toEqual({
+        responseCode: ResponseCode.SUCCESSFUL,
+        responseText: 'Record successfully updated.',
+        data: { ...mockRecord, album: 'Updated Album' },
+      });
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return a paginated list of records with filters', async () => {
+      const query: FindAllQueryDto = {
+        q: 'Test',
+        artist: 'Test Artist',
+        album: undefined,
+        format: undefined,
+        category: undefined,
+      };
+      const pagination = { skip: 0, limit: 10 };
+
+      const result = await controller.findAll(query, pagination);
+
+      expect(recordService.findAllRecords).toHaveBeenCalledWith(
+        query,
+        pagination,
+      );
+      expect(result).toEqual({
+        responseCode: ResponseCode.SUCCESSFUL,
+        responseText: 'Record successfully fetched.',
+        data: { items: [mockRecord], total: 1 },
+      });
     });
   });
 });

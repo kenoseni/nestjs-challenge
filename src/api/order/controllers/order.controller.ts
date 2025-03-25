@@ -76,6 +76,8 @@ export class OrderController {
    * @returns The cancelled Order document.
    */
   @Patch(':id/cancel')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('creator')
   @ApiOperation({ summary: 'Update an existing order' })
   @ApiResponse({ status: 200, description: 'Order cancelled successfully' })
   @ApiResponse({ status: 404, description: 'Cannot find order to cancel' })
@@ -96,6 +98,8 @@ export class OrderController {
    * @returns The approved Order document.
    */
   @Patch(':id/approve')
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles('creator')
   @ApiOperation({ summary: 'Update an existing record' })
   @ApiResponse({ status: 200, description: 'Order approved successfully' })
   @ApiResponse({ status: 404, description: 'Cannot find order to cancel' })

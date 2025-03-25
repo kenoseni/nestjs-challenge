@@ -44,7 +44,11 @@ export class RecordService {
     const record = new this.recordModel(recordData);
 
     try {
-      return await record.save();
+      const newRecord = await record.save();
+
+      await this.cacheManager.clear();
+
+      return newRecord;
     } catch (error) {
       if (error.code === 11000) {
         throw new ConflictException('Record already exists');
@@ -83,7 +87,11 @@ export class RecordService {
     }
 
     Object.assign(record, updateData);
-    return await record.save();
+    const updatedRecord = await record.save();
+
+    await this.cacheManager.clear();
+
+    return updatedRecord;
   }
 
   async findAllRecords(
@@ -98,7 +106,6 @@ export class RecordService {
     }>(cacheKey);
 
     if (cachedResult) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>Serving from cache');
       return cachedResult;
     }
     const filter = this.buildQueryFilter(query);
@@ -136,14 +143,8 @@ export class RecordService {
 
         const release = result.metadata.release[0];
 
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> release', release);
         const medium = release['medium-list'][0].medium[0];
 
-        // console.log(
-        //   '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> medium_list',
-        //   release['medium-list'],
-        // );
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> medium', medium);
         const tracks = medium['track-list'][0].track;
 
         const trackList = tracks.map((track: any) => ({
@@ -156,9 +157,7 @@ export class RecordService {
           ? parseInt(release.date[0], 10)
           : undefined;
         const country = release.country ? release.country[0] : undefined;
-        // const format = medium.format ? medium.format[0]['_'] : undefined;
 
-        // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> format', format);
         const album = release.title ? release.title[0] : undefined;
 
         const recordDetails = {
@@ -174,7 +173,7 @@ export class RecordService {
 
       return {};
     } catch (error) {
-      console.error('Failed to fetch record details:', error);
+      // console.error('Failed to fetch record details:', error);
       return {};
       //throw new BadRequestException('Invalid MBID or MusicBrainz API error');
     }

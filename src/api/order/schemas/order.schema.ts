@@ -3,7 +3,17 @@ import { Document, Types } from 'mongoose';
 import { Record } from 'src/api/record/schemas/record.schema';
 import { OrderStatus } from './order.enum';
 
-@Schema({ timestamps: true })
+@Schema({
+  timestamps: true,
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      return ret;
+    },
+  },
+  versionKey: false,
+})
 export class Order extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Record', required: true })
   record: Record;

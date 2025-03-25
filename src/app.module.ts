@@ -4,7 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AppConfig } from './app.config';
 import { OrderModule } from './api/order/order.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 import redisStore from 'cache-manager-redis-store';
@@ -24,19 +24,25 @@ import { JwtStrategy } from './api/user/strategy/jwt.strategy';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
-      useFactory: () => {
-        if (!process.env.JWT_SECRET) {
+      useFactory: (config: ConfigService) => {
+        const secret = config.get<string>('JWT_SECRET');
+        if (!secret) {
           throw new Error('JWT_SECRET is not defined in environment variables');
         }
         const options = {
-          secret: process.env.JWT_SECRET,
-          signOptions: { expiresIn: '1h' },
+          secret: secret,
+          signOptions: { expiresIn: '7d' },
         };
         return options;
       },
       global: true,
+      inject: [ConfigService],
     }),
     ThrottlerModule.forRoot({
       throttlers: [
@@ -46,25 +52,37 @@ import { JwtStrategy } from './api/user/strategy/jwt.strategy';
         },
       ],
     }),
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
 
     CacheModule.register({
-      useFactory: () => {
-        if (!process.env.REDIS_URL) {
+      useFactory: (config: ConfigService) => {
+        const redisUrl = config.get<string>('REDIS_URL');
+        const ttl = config.get<string>('REDIS_TTL');
+        if (!redisUrl) {
           throw new Error('REDIS_URL is not defined in environment variables');
         }
         return {
           store: redisStore,
-          url: process.env.REDIS_URL,
-          ttl: parseInt(process.env.REDIS_TTL, 10) || 600,
+          url: redisUrl,
+          ttl: parseInt(ttl, 10) || 600,
           isGlobal: true,
         };
       },
       isGlobal: true,
+      inject: [ConfigService],
     }),
-    MongooseModule.forRoot(AppConfig.mongoUrl),
+
+    MongooseModule.forRootAsync({
+      useFactory: (config: ConfigService) => {
+        console.log(
+          '========================',
+          config.get<string>(AppConfig.mongoUrl),
+        );
+        return {
+          uri: config.get<string>(AppConfig.mongoUrl),
+        };
+      },
+      inject: [ConfigService],
+    }),
     RecordModule,
     OrderModule,
     UserModule,

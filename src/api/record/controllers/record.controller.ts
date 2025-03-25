@@ -9,9 +9,7 @@ import {
   UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import { Record } from '../schemas/record.schema';
-import { Model } from 'mongoose';
 import { ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { CreateRecordRequestDTO } from '../dtos/create-record.request.dto';
 import { RecordCategory, RecordFormat } from '../schemas/record.enum';
@@ -29,10 +27,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Controller('records')
 @UseInterceptors(TransformInterceptor)
 export class RecordController {
-  constructor(
-    @InjectModel('Record') private readonly recordModel: Model<Record>,
-    private readonly recordService: RecordService,
-  ) {}
+  constructor(private readonly recordService: RecordService) {}
 
   @Post()
   @UseGuards(AuthGuard('jwt'), RolesGuard)

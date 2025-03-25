@@ -11,28 +11,28 @@ const App = () => {
     <Router>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
         <div className="container">
-          <Link className="navbar-brand" to="/">
-            Admin Panel
+          <Link className="navbar-brand unique-brand" to="/">
+            Broken Record Store
           </Link>
           <div className="collapse navbar-collapse">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <Link className="nav-link" to="/">
+                <Link className="nav-link text-label" to="/">
                   Dashboard
                 </Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item text-label">
                 <Link className="nav-link" to="/records">
                   Records
                 </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/orders">
+                <Link className="nav-link text-label" to="/orders">
                   Orders
                 </Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
+              <li className="nav-item text-label">
+                <Link className="nav-link text-label" to="/login">
                   Login
                 </Link>
               </li>
@@ -42,7 +42,9 @@ const App = () => {
       </nav>
 
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/" element={<Dashboard />} />
+        </Route>
         <Route path="/records" element={<Records />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/login" element={<Login />} />

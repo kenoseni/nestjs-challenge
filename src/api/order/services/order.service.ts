@@ -59,10 +59,12 @@ export class OrderService {
       await order.save({ session });
 
       await session.commitTransaction();
+
+      await this.cacheManager.clear();
+
       return order;
     } catch (error) {
       await session.abortTransaction();
-      console.error(`Failed to create order: ${error.message}`, error.stack);
       throw error instanceof NotFoundException ||
         error instanceof BadRequestException
         ? error
@@ -113,13 +115,15 @@ export class OrderService {
 
       await session.commitTransaction();
 
+      await this.cacheManager.clear();
+
       return order;
     } catch (error) {
       await session.abortTransaction();
-      console.error(
-        `Failed to cancel order ${orderId}: ${error.message}`,
-        error.stack,
-      );
+      // console.error(
+      //   `Failed to cancel order ${orderId}: ${error.message}`,
+      //   error.stack,
+      // );
       throw error instanceof NotFoundException ||
         error instanceof BadRequestException
         ? error
@@ -164,14 +168,17 @@ export class OrderService {
       await order.save({ session });
 
       await session.commitTransaction();
+
+      await this.cacheManager.clear();
+
       return order;
     } catch (error) {
       await session.abortTransaction();
 
-      console.error(
-        `Failed to cancel order ${orderId}: ${error.message}`,
-        error.stack,
-      );
+      // console.error(
+      //   `Failed to cancel order ${orderId}: ${error.message}`,
+      //   error.stack,
+      // );
       throw error instanceof NotFoundException ||
         error instanceof BadRequestException
         ? error
@@ -195,7 +202,6 @@ export class OrderService {
     }>(cacheKey);
 
     if (cachedResult) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>Serving from cache');
       return cachedResult;
     }
 
@@ -210,10 +216,8 @@ export class OrderService {
 
     try {
       await this.cacheManager.set(cacheKey, result);
-
-      console.log('I have stored in redis');
     } catch (error) {
-      console.error('Failed to cache records data:', error);
+      // console.error('Failed to cache records data:', error);
     }
 
     return result;

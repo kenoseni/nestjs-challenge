@@ -47,3 +47,17 @@ code {
   font-family: 'Segoe UI', sans-serif;
   font-weight: 700;
 }
+
+.unique-brand {
+  font-family: 'Pacifico', cursive;
+  font-size: 2rem;
+  color: #f39c12;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.text-label {
+  font-family: 'Lato', sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}

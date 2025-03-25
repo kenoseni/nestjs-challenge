@@ -13,7 +13,7 @@ async function bootstrap() {
 
   app.setGlobalPrefix('/v1');
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3001',
   });
 
   app.getHttpAdapter().getInstance().disable('x-powered-by');
