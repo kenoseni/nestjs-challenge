@@ -83,6 +83,14 @@ Here’s an example of the data.json file that contains records:
 ]
 ```
 
+#### api/common/helpers/seeders.service.ts
+
+You can add your username in this file and start the app. Your information will be seeded in and you can use the username and role('creator', 'customer', or both) to login to access some route
+
+#### .env
+
+I have committed the two(2) `.env` to version control since it contains no sensitive information
+
 ### Running the Server-side App
 
 #### Development Mode
