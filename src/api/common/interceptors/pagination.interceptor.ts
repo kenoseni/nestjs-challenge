@@ -25,7 +25,7 @@ export class PaginationInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((response) => {
         const { data } = response;
-        console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>.', data);
+
         if (
           !data ||
           typeof data !== 'object' ||

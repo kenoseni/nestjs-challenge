@@ -120,10 +120,7 @@ export class OrderService {
       return order;
     } catch (error) {
       await session.abortTransaction();
-      // console.error(
-      //   `Failed to cancel order ${orderId}: ${error.message}`,
-      //   error.stack,
-      // );
+
       throw error instanceof NotFoundException ||
         error instanceof BadRequestException
         ? error
@@ -175,10 +172,6 @@ export class OrderService {
     } catch (error) {
       await session.abortTransaction();
 
-      // console.error(
-      //   `Failed to cancel order ${orderId}: ${error.message}`,
-      //   error.stack,
-      // );
       throw error instanceof NotFoundException ||
         error instanceof BadRequestException
         ? error

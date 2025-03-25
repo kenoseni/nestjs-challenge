@@ -52,9 +52,8 @@ describe('OrderController', () => {
 
       const result = await controller.createOrder(createOrderDto);
 
-      // Verify that the OrderService.createOrder method was called with the DTO
       expect(orderService.createOrder).toHaveBeenCalledWith(createOrderDto);
-      // Check that the returned response object has the expected structure and data
+
       expect(result).toEqual({
         responseCode: ResponseCode.SUCCESSFUL,
         responseText: 'Order successfully created.',

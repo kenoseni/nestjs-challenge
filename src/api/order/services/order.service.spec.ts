@@ -179,7 +179,6 @@ describe('OrderService', () => {
     });
 
     it('should cancel order successfully', async () => {
-      // Setup a valid order and record.
       const order = new OrderModelMock({
         record: 'record-id',
         quantity: 2,
@@ -288,7 +287,7 @@ describe('OrderService', () => {
       const totalCount = 2;
       const execFind = jest.fn().mockResolvedValue(ordersList);
       const execCount = jest.fn().mockResolvedValue(totalCount);
-      // Simulate chaining for find().
+
       OrderModelMock.find.mockReturnValue({
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
