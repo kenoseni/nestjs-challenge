@@ -4,6 +4,20 @@
 
 This is a **NestJS** application starter with MongoDB integration. If necessary, it provides a script to boot a Mongo emulator for Docker. This setup includes end-to-end tests, unit tests, test coverage, linting, and database setup with data from `data.json`.
 
+## Features
+
+- User Seed
+- Basic authentication
+- Record creation
+- Record search
+- Order creation
+- Order approval
+- Order cancellation
+- Caching
+- Pagination
+- Unit test
+- E2E tests
+
 ## Installation
 
 ### Install dependencies:
