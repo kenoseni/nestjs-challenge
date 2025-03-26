@@ -12,7 +12,7 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { RecordFormat, RecordCategory } from '../schemas/record.enum';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class CreateRecordRequestDTO {
   @ApiProperty({
@@ -22,6 +22,7 @@ export class CreateRecordRequestDTO {
   })
   @IsString()
   @IsNotEmpty()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   artist: string;
 
   @ApiProperty({
@@ -31,6 +32,7 @@ export class CreateRecordRequestDTO {
   })
   @IsString()
   @IsNotEmpty()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   album: string;
 
   @ApiProperty({
@@ -77,6 +79,7 @@ export class CreateRecordRequestDTO {
     example: 'b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d',
   })
   @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   mbid?: string;
 
   @ApiProperty({

@@ -7,6 +7,7 @@ import { MbidService } from 'src/api/integrations/mbid/mbid.service';
 import { RecordCategory, RecordFormat } from '../schemas/record.enum';
 import { CreateRecordRequestDTO } from '../dtos/create-record.request.dto';
 import { Record } from '../schemas/record.schema';
+import { generateObjectId } from 'src/api/common/helpers/generate-id';
 
 describe('RecordService', () => {
   let service: RecordService;
@@ -107,8 +108,9 @@ describe('RecordService', () => {
 
   describe('updateRecord', () => {
     it('updates a record successfully without changing mbid', async () => {
+      const id = generateObjectId();
       const existingRecord = {
-        _id: '1',
+        _id: id,
         album: 'Old Album',
         mbid: '123',
         price: 10,
@@ -129,15 +131,16 @@ describe('RecordService', () => {
         format: RecordFormat.VINYL,
         category: RecordCategory.ROCK,
       };
-      const updatedRecord = await service.updateRecord('1', updatePayload);
+      const updatedRecord = await service.updateRecord(id, updatePayload);
 
       expect(existingRecord.save).toHaveBeenCalled();
       expect(updatedRecord.album).toEqual('Updated Album');
     });
 
     it('updates a record and fetches new API details if mbid changes', async () => {
+      const id = generateObjectId();
       const existingRecord = {
-        _id: '1',
+        _id: id,
         album: 'Old Album',
         mbid: '123',
         price: 10,
@@ -164,15 +167,16 @@ describe('RecordService', () => {
       cacheManager.get.mockResolvedValue(null);
       mbidService.getTrackList.mockResolvedValue(xmlResponse);
 
-      const updatedRecord = await service.updateRecord('1', updateDto);
+      const updatedRecord = await service.updateRecord(id, updateDto);
       expect(existingRecord.save).toHaveBeenCalled();
       expect(updatedRecord).toHaveProperty('mbid', '456');
     });
 
     it('throws NotFoundException if record does not exist', async () => {
+      const id = generateObjectId();
       recordModel.findById.mockResolvedValue(null);
       await expect(
-        service.updateRecord('nonexistent', {
+        service.updateRecord(id, {
           price: 10,
           qty: 1,
           format: RecordFormat.VINYL,

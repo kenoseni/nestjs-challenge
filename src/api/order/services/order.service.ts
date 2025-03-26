@@ -12,6 +12,7 @@ import { Record } from 'src/api/record/schemas/record.schema';
 import { Order } from '../schemas/order.schema';
 import { CreateOrderRequestDTO } from '../dtos/create-order.request.dto';
 import { OrderStatus } from '../schemas/order.enum';
+import { isValidId } from 'src/api/common/helpers/is-valid-id';
 
 @Injectable()
 export class OrderService {
@@ -82,6 +83,7 @@ export class OrderService {
    * @throws NotFoundException if order or record is not found.
    */
   async cancelOrder(orderId: string) {
+    isValidId(orderId);
     const session: ClientSession = await this.orderModel.db.startSession();
     session.startTransaction();
 
@@ -140,6 +142,7 @@ export class OrderService {
    * @throws NotFoundException if order or record is not found.
    */
   async approveOrder(orderId: string): Promise<Order> {
+    isValidId(orderId);
     const session: ClientSession = await this.orderModel.db.startSession();
     session.startTransaction();
 

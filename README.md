@@ -161,3 +161,7 @@ npm run lint
 ```
 
 This command will show you any linting issues with your code.
+
+#### API Documentation
+
+`/swagger`

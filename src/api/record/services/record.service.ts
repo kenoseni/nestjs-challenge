@@ -14,6 +14,7 @@ import { MbidService } from 'src/api/integrations/mbid/mbid.service';
 import { parseStringPromise } from 'xml2js';
 import { UpdateRecordRequestDTO } from '../dtos/update-record.request.dto';
 import { FindAllQueryDto } from '../dtos/filter-record.dto';
+import { isValidId } from 'src/api/common/helpers/is-valid-id';
 
 @Injectable()
 export class RecordService {
@@ -48,6 +49,10 @@ export class RecordService {
 
       await this.cacheManager.clear();
 
+      if (createRecordDto.mbid && Object.keys(apiDetails).length > 0) {
+        await this.cacheManager.set(createRecordDto.mbid, apiDetails, 600);
+      }
+
       return newRecord;
     } catch (error) {
       if (error.code === 11000) {
@@ -68,6 +73,7 @@ export class RecordService {
     id: string,
     updateRecordDto: UpdateRecordRequestDTO,
   ): Promise<Record> {
+    isValidId(id);
     const record = await this.recordModel.findById(id);
     if (!record) {
       throw new NotFoundException('Record not found');
@@ -84,6 +90,10 @@ export class RecordService {
       } catch (error) {
         console.error('Failed to fetch record details:', error);
       }
+    } else if (updateRecordDto.mbid && updateRecordDto.mbid === record.mbid) {
+      apiDetails = await this.cacheManager.get(updateRecordDto.mbid);
+
+      updateData = { ...updateData, ...apiDetails };
     }
 
     Object.assign(record, updateData);
